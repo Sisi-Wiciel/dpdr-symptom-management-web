@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>CDS-State</title>
+
+    <!-- CSS: jspsych -->
+    <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css">
+    <!-- CSS: Custom -->
+    <link href="exp.css" rel="stylesheet" type="text/css">
+
+    <!-- JS: Basic -->
+    <script src="jspsych/jspsych.js"></script>
+    <script src="jspsych/plugin-fullscreen.js"></script>
+    <!-- JS: Survey -->
+    <script src="jspsych/plugin-survey-html-form.js"></script>
+    <script src="jspsych/plugin-survey-text.js"></script>
+    <!-- JS: Stimulus-Response -->
+    <script src="jspsych/plugin-html-button-response.js"></script>
+    <script src="jspsych/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/plugin-html-slider-response.js"></script>
+</head>
+
+<body>
+</body>
+<script>
+    var today=new Date();
+    /* experiment parameters */
+    var jsPsych=initJsPsych({
+        timeline: main_timeline,
+        show_progress_bar: true,
+        on_finish: function() {
+            jsPsych.data.get().localSave('csv', `CDS_S_${today}.csv`)
+        }
+    })
+
+
+    /* define welcome message block */
+    var open_fullscreen = {
+        type: jsPsychFullscreen,
+        fullscreen_mode: true,
+        message: `
+        <p style="font: 16pt 微软雅黑; text-align: left; line-height: 1.6em">
+        <b>
+        测验将在一个「全屏页面」开始，为确保最佳效果，请你：<br/>
+        （1）在电脑上进行测验，并使用主流浏览器打开本网页<br/>
+        &emsp;&emsp;（Chrome、Edge、Firefox、Safari等，不要用IE）<br/>
+        （2）关掉电脑上其他正在运行的程序或将其最小化<br/>
+        （3）将手机调至静音，并尽可能减少环境噪音干扰<br/>
+        （4）在测验过程中不要退出全屏<br/>
+        （5）务必认真作答<br/><br/>
+        </b>
+        如果你同意参与，并且清楚理解了上述要求，请点击开始：
+        </p>`,
+        button_label: '点击这里全屏开始',
+        delay_after: 100
+    };
+
+    var welcome = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+        <p style="font: bold 32pt 微软雅黑; color: #B22222">
+        欢迎填写我们的问卷</p>
+        <p style="font: 20pt 微软雅黑; color: black"><br/>
+        <按空格键继续><br/>
+        <b>实验过程中请勿退出全屏</b><br/><br/></p>
+        <p style="font: 20pt 华文中宋; color: grey">
+        首都医科大学附属北京安定医院<br/>2023年</p>`,
+        choices: [' '],
+        post_trial_gap: 100
+    };
+
+    var close_fullscreen = {
+        type: jsPsychFullscreen,
+        fullscreen_mode: false,
+        delay_after: 0
+    };
+
+    /* Blocks: Surveys */
+    var demographics = {
+        type:jsPsychSurveyText,
+        questions:[
+            {prompt:'你的姓名',placeholder:'必填',required:true,name:'Name'},
+        ],
+        button_label:'继续',
+        data:{task: 'demographics'},
+    };
+
+    var CDS_State = {
+        timeline: [{
+            type: jsPsychHtmlSliderResponse,
+            data: jsPsych.timelineVariable('data'),
+            stimulus: jsPsych.timelineVariable('s'),
+            prompt: `
+            <p style="font: 12pt 微软雅黑; position:absolute;top:200px;left:100px;text-align:center; line-height: 1.0em">
+            这份问卷描述了人们在日常生活中可能出现的奇怪且"可笑"的感受。请仔细阅读以下每项描述。
+            如果你感觉自己“此时此刻”就有这些体验，请在横线做标记，让我们知道这种体验在当下的严重程度。</p>
+            `,
+            labels: ['0%完全没有这种体验', '100%这种体验严重至极'],
+            slider_width: 500,
+            min: 0,
+            max: 100,
+            step: 1,
+            require_movement: true,
+            post_trial_gap: 50
+        }],
+        timeline_variables: [
+            { data: { i: 1 }, s: '1.我此刻有一种奇怪的感觉，好像自己不真实或与世界隔绝开了' },
+            { data: { i: 2 }, s: '2.周围的事物此刻看起来就像一幅画，缺乏立体感，或是毫无生机的' },
+            { data: { i: 3 }, s: '3.我此刻感觉部分身体好像不属于我自己。' },
+            { data: { i: 4 }, s: '4.我此刻感觉就像“旁观者”一样在观察自己。' },
+            { data: { i: 5 }, s: '5.我此刻感觉身体非常轻，好像飘在空中一样' },
+            { data: { i: 6 }, s: '6.我此刻感受不到任何情绪'},
+            { data: { i: 7 }, s: '7.当我大声读这句话时，我的声音听起来遥远且不真实。' },
+            { data: { i: 8 }, s: '8.我此刻感觉头脑里空空荡荡，所以我此刻没有任何思维。' },
+            { data: { i: 9 }, s: '9.我此刻感觉我的手或脚变大或变小了。' },
+            { data: { i: 10 }, s: '10.我此刻感觉与周围环境脱节，或感觉周围环境不真实，就像与世界隔着一层纱或雾' },
+            { data: { i: 11 }, s: '11.此刻看来，我最近做的事情就像发生在很久以前一样。例如，我感觉今早所做的一切都发生在几周前' },
+            { data: { i: 12 }, s: '12.当我试着回忆人生中的重要事件（如毕业典礼、婚礼等），会感觉与这些记忆完全分离，就像我没有参与其中一样'},
+            { data: { i: 13 }, s: '13.我此刻似乎感受不到任何对家人或好友的情感' },
+            { data: { i: 14 }, s: '14.周围的事物此刻看起来就像一幅画，缺乏立体感，或是毫无生机的。' },
+            { data: { i: 15 }, s: '15.我不能充分感受到手中的物品，就像不是我在握着它一样' },
+            { data: { i: 16 }, s: '16.如果我此刻试着想象一个经常见面的亲人或朋友的脸（但他此刻不在我旁边），我似乎无法在脑海中将其描绘出来' },
+            { data: { i: 17 }, s: '17.如果我此刻掐一下自己的胳膊，会感到与痛觉完全分离，就像这是“别人的疼痛”一样' },
+            { data: { i: 18 }, s: '18.我此刻感觉自己在身体之外'},
+            { data: { i: 19 }, s: '19.我此刻对自身动作没有控制感，所以感觉自己是“自动的”、机械的，就像“机器人”一样' },
+            { data: { i: 20 }, s: '20.我此刻感觉与自身思维完全分离，仿佛思维有自己的“生命”一样' },
+            { data: { i: 21 }, s: '21.我想触摸自己，以确保躯体或自己真实存在' },
+            { data: { i: 22 }, s: '22.此刻仍有和开始回答问卷时一样的奇怪感受' },
+         
+        ],
+        randomize_order: false
+    };
+
+
+    var OpenEnded = {
+        type: jsPsychSurveyText,
+        data: { varname: 'OpenEnded' },
+        questions: [{
+            prompt: '问卷已经完全结束，你可以分享任何疑问或想法：',
+            placeholder: '非必答',
+            rows: 5,
+            columns: 50,
+            required: false
+        }],
+        button_label: '完成',
+    };
+
+    /* Combine Timelines */
+
+    var main_timeline = [
+        open_fullscreen,
+        demographics,
+        welcome,
+        CDS_State,
+        OpenEnded,
+        close_fullscreen,
+    ]
+
+
+    /* start the experiment */
+    jsPsych.run(main_timeline);
+    
+</script>
+</html>

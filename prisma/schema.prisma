@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PATIENT
+  CLINICIAN
+  RESEARCH_ASSISTANT
+  PROJECT_OWNER
+  PLATFORM_ADMIN
+}
+
+enum MembershipRole {
+  PATIENT
+  CLINICIAN
+  RESEARCH_ASSISTANT
+  OWNER
+}
+
+enum DataScope {
+  SHARED
+  PROJECT_PRIVATE
+}
+
+enum ScaleKind {
+  BASELINE
+  DAILY
+  FOLLOW_UP
+}
+
+enum InstrumentAdministration {
+  SELF
+  CLINICIAN
+}
+
+enum ResponseStatus {
+  FORMAL
+  SUPPLEMENTARY
+}
+
+enum TreatmentConfirmationStatus {
+  PENDING
+  CONFIRMED
+  CORRECTED
+}
+
+model User {
+  id               String             @id @default(cuid())
+  email            String             @unique
+  passwordHash     String?
+  displayName      String
+  primaryRole      UserRole
+  locale           String             @default("zh-CN")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  memberships      ProjectMembership[]
+  scaleResponses   ScaleResponse[]    @relation("PatientScaleResponses")
+  treatmentRecords TreatmentRecord[]  @relation("PatientTreatmentRecords")
+  reviewedTreatments TreatmentRecord[] @relation("ConfirmedTreatmentRecords")
+  auditEvents      AuditEvent[]       @relation("AuditActor")
+}
+
+model Project {
+  id           String              @id @default(cuid())
+  slug         String              @unique
+  title        String
+  description  String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  memberships  ProjectMembership[]
+  instruments  Instrument[]
+  scaleEntries ScaleResponse[]
+  treatments   TreatmentRecord[]
+}
+
+model ProjectMembership {
+  id          String         @id @default(cuid())
+  userId      String
+  projectId   String
+  role        MembershipRole
+  canProxyAdd Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId, role])
+  @@index([projectId, role])
+}
+
+model Instrument {
+  id           String              @id @default(cuid())
+  code         String              @unique
+  title        String
+  description  String?
+  defaultScope DataScope           @default(PROJECT_PRIVATE)
+  kind         ScaleKind
+  administration InstrumentAdministration @default(SELF)
+  projectId    String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  project      Project?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  versions     InstrumentVersion[]
+
+  @@index([administration, kind])
+}
+
+model InstrumentVersion {
+  id            String          @id @default(cuid())
+  instrumentId  String
+  versionLabel  String
+  schema        Json
+  isActive      Boolean         @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  instrument    Instrument      @relation(fields: [instrumentId], references: [id], onDelete: Cascade)
+  scaleEntries  ScaleResponse[]
+
+  @@unique([instrumentId, versionLabel])
+}
+
+model ScaleResponse {
+  id                    String                @id @default(cuid())
+  patientId             String
+  projectId             String?
+  instrumentVersionId   String
+  entryDate             DateTime
+  status                ResponseStatus        @default(FORMAL)
+  isBackfilled          Boolean               @default(false)
+  reusesPreviousAnswers Boolean               @default(false)
+  totalScore            Float?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  patient               User                  @relation("PatientScaleResponses", fields: [patientId], references: [id], onDelete: Cascade)
+  project               Project?              @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  instrumentVersion     InstrumentVersion     @relation(fields: [instrumentVersionId], references: [id], onDelete: Restrict)
+  revisions             ScaleResponseRevision[]
+
+  @@index([patientId, entryDate])
+  @@index([projectId, entryDate])
+}
+
+model ScaleResponseRevision {
+  id            String        @id @default(cuid())
+  responseId    String
+  versionNumber Int
+  answers       Json
+  totalScore    Float?
+  editorId      String?
+  createdAt     DateTime      @default(now())
+  response      ScaleResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+
+  @@unique([responseId, versionNumber])
+}
+
+model TreatmentRecord {
+  id                 String                        @id @default(cuid())
+  patientId          String
+  projectId          String?
+  medicationName     String
+  singleDose         String
+  instructions       String
+  adverseEffects     Json
+  notes              String?
+  confirmationStatus TreatmentConfirmationStatus  @default(PENDING)
+  confirmedById      String?
+  confirmedAt        DateTime?
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @updatedAt
+  patient            User                          @relation("PatientTreatmentRecords", fields: [patientId], references: [id], onDelete: Cascade)
+  project            Project?                      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  confirmedBy        User?                         @relation("ConfirmedTreatmentRecords", fields: [confirmedById], references: [id], onDelete: SetNull)
+  revisions          TreatmentRevision[]
+
+  @@index([patientId, updatedAt])
+  @@index([projectId, confirmationStatus, updatedAt])
+}
+
+model TreatmentRevision {
+  id           String          @id @default(cuid())
+  recordId     String
+  version      Int
+  payload      Json
+  editorId     String?
+  createdAt    DateTime        @default(now())
+  record       TreatmentRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  @@unique([recordId, version])
+}
+
+model AuditEvent {
+  id         String    @id @default(cuid())
+  actorId    String?
+  actorRole  UserRole?
+  action     String
+  entityType String
+  entityId   String
+  before     Json?
+  after      Json?
+  createdAt  DateTime  @default(now())
+  actor      User?     @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}

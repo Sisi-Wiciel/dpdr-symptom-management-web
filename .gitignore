@@ -7,3 +7,5 @@ build/
 .DS_Store
 coverage/
 .hermes/
+tsconfig.tsbuildinfo
+CDSS在线评测.zip
