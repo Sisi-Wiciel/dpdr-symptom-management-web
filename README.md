@@ -2,6 +2,31 @@
 
 This repository is currently being planned as a **real-world research platform for depersonalization-derealization disorder (DPDR)**, with patient self-monitoring as the first core use case.
 
+## Production deployment
+
+The repository now includes the production compose file and release workflow that are currently used for the live deployment.
+
+### Files
+
+- `docker-compose.prod.yml`: production stack with PostgreSQL and the app bound to `127.0.0.1:${WEB_PORT:-3001}`
+- `.env.production.example`: server-side environment template
+- `infra/deploy/release.sh`: reusable release entrypoint that auto-detects `docker compose` or `docker-compose`
+
+### Deploy flow
+
+1. Copy `.env.production.example` to `.env` on the server and replace secrets.
+2. Run `./infra/deploy/release.sh deploy`.
+3. Reverse-proxy `127.0.0.1:${WEB_PORT:-3001}` from Nginx and issue the TLS certificate.
+
+The release script intentionally builds only the `web` image first, then runs `npm run db:push && npm run db:seed` inside that built image before starting the long-running web container. This avoids the `esbuild ETXTBSY` failure we hit on the production server when `web` and `bootstrap` were built in parallel.
+
+### Common commands
+
+- `./infra/deploy/release.sh deploy`
+- `./infra/deploy/release.sh ps`
+- `./infra/deploy/release.sh logs`
+- `./infra/deploy/release.sh down`
+
 ## Current planning direction
 
 ### Primary purpose of v1
