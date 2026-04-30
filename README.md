@@ -13,14 +13,20 @@ This repository is currently being planned as a **real-world research platform f
 - **Cambridge Depersonalization Scale (CDS)** as a baseline instrument.
 - **State version of the CDS** for repeated/high-frequency symptom monitoring.
 - State monitoring strategy: **scheduled check-ins + additional entries during symptom exacerbations/episodes**.
+- The **CDS-S / state CDS** used in V1 is assumed to already have defined:
+  - questionnaire items
+  - answer options
+  - scoring rules
+  - Chinese and English wording
 
 ### Main roles
 #### Patient side
 V1 must include:
 - Registration and login
 - Baseline questionnaire / baseline scale completion
-- State scale completion
-- Historical trend visualization
+- Daily CDS-S / state scale completion
+- Manual import of the previous CDS-S answers as a starting point for the current entry
+- Historical trend visualization after completion, with patient-visible content configurable by doctors / research projects
 
 #### Doctor side
 V1 doctor functions are expected to go beyond passive viewing and include research/clinical management functions.
@@ -29,11 +35,39 @@ Current direction includes:
 - Confirming whether treatment records are consistent with real clinical treatment
 - Correcting treatment records when needed while preserving the audit trail
 - Managing patients within research projects
+- Configuring how daily CDS-S entries are treated as formal records versus supplementary records
+- Configuring what symptom trend content is shown back to patients after completion
 
 #### Admin side
 - Platform-style admin functions are recognized as necessary, but can be postponed to a later stage.
 
 ## Data domains clarified so far
+
+### 0) Daily CDS-S / state DPDR monitoring
+V1 symptom monitoring is centered on **daily CDS-S entries**.
+
+Current decisions:
+- Patients generally complete the CDS-S once per day as the primary self-monitoring task.
+- A daily entry asks about the patient's **overall state for the day**.
+- The system should support **one formal daily record plus supplementary records** when needed.
+- The rule for determining the formal record should be **configurable by doctors / research projects**.
+- Patients may manually import the previous CDS-S answers as a template for the current entry.
+- Imported answers may be submitted without modification, but the record must be marked as having reused the previous result.
+- Retrospective / missed-day completion is allowed, but must be marked as retrospective.
+- If retrospective completion uses imported answers, both flags must be preserved.
+- Patients may modify submitted CDS-S records.
+- Modifications must preserve version history and audit information.
+
+CDS-S instrument implementation:
+- V1 assumes the CDS-S has fixed, defined items, answer options, and scoring rules.
+- The system should store the instrument version used for each submitted record.
+- The scale must support both **Chinese and English** wording.
+- Scoring should be reproducible from stored item-level answers, not only stored as a total score.
+
+Patient feedback after completion:
+- The default simple feedback is a recent trend view, such as the latest 7-day CDS-S total score trend.
+- The exact patient-visible trend content should be configurable by doctors / research projects.
+- Patient-facing feedback should avoid forcing a fixed clinical interpretation unless configured by the study protocol.
 
 ### 1) Intervention / treatment recording
 Both of the following should be recorded:
