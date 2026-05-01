@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ClipboardPlus, ShieldCheck, Stethoscope } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ClipboardPlus, ShieldCheck, Stethoscope } from "lucide-react";
 import { MetricCard } from "@/components/metric-card";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteHeader } from "@/components/site-header";
@@ -132,6 +132,30 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+        </section>
+        <section id="community" className="mx-auto mt-24 max-w-7xl">
+          <a
+            href="https://home.depersonalization.site"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="前往人格解体之家"
+            className="surface-card group flex flex-col gap-6 rounded-[40px] p-8 transition hover:-translate-y-1 md:flex-row md:items-center md:justify-between md:p-10"
+          >
+            <div className="space-y-3">
+              <span className="eyebrow">社区资源</span>
+              <h2 className="display-heading text-3xl font-semibold text-[var(--ink)] md:text-4xl">
+                人格解体之家
+              </h2>
+              <p className="max-w-2xl text-base leading-7 text-[var(--muted)]">
+                <strong className="font-semibold text-[var(--ink)]">home.depersonalization.site</strong>{" "}
+                是一个面向人格解体患者的社群与信息平台，汇集了最新的招募发布、研究进展动态以及患者支持资源。
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2 font-semibold text-[var(--accent-warm)]">
+              前往查看
+              <ArrowUpRight className="h-5 w-5 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </div>
+          </a>
         </section>
       </main>
     </div>

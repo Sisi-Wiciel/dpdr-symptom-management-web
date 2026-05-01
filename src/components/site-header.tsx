@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 const navItems = [
   { label: "定位", href: "#positioning" },
@@ -23,6 +24,15 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <a
+            href="https://home.depersonalization.site"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 transition hover:text-[var(--ink)]"
+          >
+            人格解体之家
+            <ExternalLink className="h-3 w-3" />
+          </a>
         </nav>
         <div className="flex items-center gap-3">
           <Link href="/signin" className="pill pill-secondary hidden md:inline-flex">
