@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { signOutAction } from "@/lib/auth/actions";
@@ -82,6 +83,18 @@ export function WorkspaceShell({
               </form>
             </div>
           ) : null}
+          <a
+            href="https://home.depersonalization.site"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between rounded-[24px] border border-[var(--line)] bg-white/50 px-4 py-4 text-sm transition hover:bg-white/80"
+          >
+            <div>
+              <p className="font-semibold text-[var(--ink)]">人格解体之家</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--muted)]">招募发布 · 研究进展</p>
+            </div>
+            <ExternalLink className="h-4 w-4 shrink-0 text-[var(--muted)]" />
+          </a>
         </aside>
         <main className="space-y-6">{children}</main>
       </div>
