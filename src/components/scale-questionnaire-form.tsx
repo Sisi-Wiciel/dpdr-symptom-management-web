@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   calculateInstrumentScore,
@@ -191,7 +191,7 @@ export function ScaleQuestionnaireForm({ instrument }: ScaleQuestionnaireFormPro
 
   const itemCount = getInstrumentItemCount(instrument);
   const rawScore = calculateInstrumentScore(instrument, answers);
-  const steps = buildSteps(instrument);
+  const steps = useMemo(() => buildSteps(instrument), [instrument]);
 
   function handleChange(code: string, value: number) {
     setAnswers((current) => ({ ...current, [code]: value }));
