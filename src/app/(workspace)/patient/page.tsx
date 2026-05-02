@@ -233,12 +233,24 @@ export default async function PatientPage() {
             {data.selfRatedScaleLibrary.length > 0 ? (
               data.selfRatedScaleLibrary.map((item) => (
                 <div key={item.code} className="rounded-[24px] border border-[var(--line)] bg-white/70 px-5 py-5">
-                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--accent-warm)]">{item.code}</p>
-                  <p className="mt-3 text-base font-semibold text-[var(--ink)]">{item.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.summary}</p>
-                  <p className="mt-3 text-sm font-medium text-[var(--accent-ink)]">{item.cadence}</p>
-                  {item.preview ? <p className="mt-4 whitespace-pre-line text-sm leading-6 text-[var(--muted)]">{item.preview}</p> : null}
-                  {item.sourcePath ? <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">{item.sourcePath}</p> : null}
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--accent-warm)]">{item.code}</p>
+                      <p className="mt-3 text-base font-semibold text-[var(--ink)]">{item.title}</p>
+                      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{item.summary}</p>
+                      <p className="mt-3 text-sm font-medium text-[var(--accent-ink)]">{item.cadence}</p>
+                      {item.preview ? <p className="mt-4 whitespace-pre-line text-sm leading-6 text-[var(--muted)]">{item.preview}</p> : null}
+                      {item.sourcePath ? <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[var(--muted)]">{item.sourcePath}</p> : null}
+                    </div>
+                    <div className="shrink-0">
+                      <a
+                        href={`/patient/scale/${encodeURIComponent(item.code)}`}
+                        className="inline-flex items-center rounded-full bg-[var(--ink)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-80"
+                      >
+                        开始答题 →
+                      </a>
+                    </div>
+                  </div>
                 </div>
               ))
             ) : (
