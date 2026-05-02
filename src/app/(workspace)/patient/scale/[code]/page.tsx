@@ -31,7 +31,7 @@ export default async function ScalePage({ params }: Props) {
       title="患者端"
       description="自评量表答题"
       activeHref="/patient"
-      navItems={workspaceNavItems.map((item) => ({ ...item }))}
+      navItems={workspaceNavItems}
       viewer={{
         displayName: session.displayName,
         email: session.email,
