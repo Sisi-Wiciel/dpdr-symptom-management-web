@@ -292,12 +292,14 @@ export function PatientDailyInstrumentForm({
         ) : (
           /* ---- Scroll mode ---- */
           <div className="space-y-5">
-            {instrument.sections.map((section) => (
-              <section key={section.id} className="rounded-[28px] border border-[var(--line)] bg-white/70 p-5 md:p-6">
-                <h4 className="text-base font-semibold text-[var(--ink)]">{section.title}</h4>
-                <div className="mt-5 space-y-5">
-                  {section.items.map((item, index) => {
-                    const globalIndex = allItems.findIndex((i) => i.code === item.code);
+            {(() => {
+              const globalIndexMap = new Map(allItems.map((item, idx) => [item.code, idx]));
+              return instrument.sections.map((section) => (
+                <section key={section.id} className="rounded-[28px] border border-[var(--line)] bg-white/70 p-5 md:p-6">
+                  <h4 className="text-base font-semibold text-[var(--ink)]">{section.title}</h4>
+                  <div className="mt-5 space-y-5">
+                    {section.items.map((item) => {
+                      const globalIndex = globalIndexMap.get(item.code) ?? 0;
                     return (
                       <div key={item.code} className="rounded-[24px] border border-[var(--line)] bg-white px-4 py-5 md:px-5">
                         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -342,7 +344,8 @@ export function PatientDailyInstrumentForm({
                   })}
                 </div>
               </section>
-            ))}
+            ));
+            })()}
           </div>
         )}
 
