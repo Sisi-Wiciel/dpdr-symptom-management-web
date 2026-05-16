@@ -6,11 +6,19 @@ This repository is currently being planned as a **real-world research platform f
 
 The repository now includes the production compose file and release workflow that are currently used for the live deployment.
 
+### Server info
+
+- **Domain**: `cds.depersonalization.top`
+- **Server**: `82.156.45.146` (SSH: `root@82.156.45.146`)
+- **Project path**: `/root/dpdr-symptom-management-web`
+
 ### Files
 
 - `docker-compose.prod.yml`: production stack with PostgreSQL and the app bound to `127.0.0.1:${WEB_PORT:-3001}`
 - `.env.production.example`: server-side environment template
 - `infra/deploy/release.sh`: reusable release entrypoint that auto-detects `docker compose` or `docker-compose`
+- `infra/nginx/cds.depersonalization.top.conf`: Nginx reverse-proxy config with SSL
+- `.github/workflows/deploy.yml`: GitHub Actions auto-deploy on push to main
 
 ### Deploy flow
 
@@ -19,6 +27,17 @@ The repository now includes the production compose file and release workflow tha
 3. Reverse-proxy `127.0.0.1:${WEB_PORT:-3001}` from Nginx and issue the TLS certificate.
 
 The release script intentionally builds only the `web` image first, then runs `npm run db:push && npm run db:seed` inside that built image before starting the long-running web container. This avoids the `esbuild ETXTBSY` failure we hit on the production server when `web` and `bootstrap` were built in parallel.
+
+### GitHub Actions auto-deploy
+
+On every push to `main`, GitHub Actions deploys via SSH. Required repository secrets:
+
+| Secret | Value |
+|--------|-------|
+| `DEPLOY_HOST` | `82.156.45.146` |
+| `DEPLOY_USER` | `root` |
+| `DEPLOY_SSH_KEY` | SSH private key |
+| `DEPLOY_PATH` | `/root/dpdr-symptom-management-web` |
 
 ### Common commands
 
